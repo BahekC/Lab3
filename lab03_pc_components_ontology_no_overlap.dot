@@ -1,0 +1,100 @@
+digraph PCComponentsOntology {
+    graph [
+        rankdir=LR,
+        bgcolor="white",
+        pad="0.45",
+        nodesep="0.75",
+        ranksep="1.25",
+        splines=line,
+        overlap=false,
+        concentrate=false,
+        outputorder=edgesfirst,
+        fontname="DejaVu Sans",
+        label="Онтология предметной области: комплектующие персонального компьютера",
+        labelloc=t,
+        fontsize=22
+    ];
+
+    node [
+        shape=box,
+        style="rounded,filled",
+        fontname="DejaVu Sans",
+        fontsize=13,
+        margin="0.16,0.08",
+        color="#404040",
+        fillcolor="#F8F8F8"
+    ];
+
+    edge [
+        fontname="DejaVu Sans",
+        fontsize=10,
+        color="#333333",
+        arrowsize=0.75
+    ];
+
+    // Уровень 1
+    "Компьютер";
+
+    // Уровень 2
+    { rank=same; "Системный блок"; "Периферийные устройства"; }
+
+    // Уровень 3
+    { rank=same; "Основные комплектующие"; "Корпус"; "Блок питания"; "Система охлаждения"; "Устройство ввода"; "Устройство вывода"; }
+
+    // Уровень 4
+    { rank=same; "Материнская плата"; "Процессор"; "Оперативная память"; "Накопитель данных"; "Видеокарта"; "Клавиатура"; "Мышь"; "Монитор"; "Принтер"; }
+
+    // Уровень 5
+    { rank=same; "BIOS/UEFI"; "HDD"; "SSD"; "Intel Core i5"; "AMD Ryzen 5"; "Kingston Fury 16 GB"; "NVIDIA GeForce RTX 3060"; "Chieftec 650W"; }
+
+    // Уровень 6
+    { rank=same; "Операционная система"; "Samsung 970 EVO"; }
+
+    // Уровень 7
+    { rank=same; "Windows 11"; "Ubuntu Linux"; }
+
+    "Компьютер" -> "Системный блок" [label="part_of"];
+    "Компьютер" -> "Периферийные устройства" [label="part_of"];
+
+    "Системный блок" -> "Основные комплектующие" [label="part_of"];
+    "Системный блок" -> "Корпус" [label="part_of"];
+    "Системный блок" -> "Блок питания" [label="part_of"];
+    "Системный блок" -> "Система охлаждения" [label="part_of"];
+
+    "Основные комплектующие" -> "Материнская плата" [label="part_of"];
+    "Основные комплектующие" -> "Процессор" [label="part_of"];
+    "Основные комплектующие" -> "Оперативная память" [label="part_of"];
+    "Основные комплектующие" -> "Накопитель данных" [label="part_of"];
+    "Основные комплектующие" -> "Видеокарта" [label="part_of"];
+
+    "Периферийные устройства" -> "Устройство ввода" [label="has_type"];
+    "Периферийные устройства" -> "Устройство вывода" [label="has_type"];
+    "Клавиатура" -> "Устройство ввода" [label="is_a"];
+    "Мышь" -> "Устройство ввода" [label="is_a"];
+    "Монитор" -> "Устройство вывода" [label="is_a"];
+    "Принтер" -> "Устройство вывода" [label="is_a"];
+
+    "HDD" -> "Накопитель данных" [label="is_a"];
+    "SSD" -> "Накопитель данных" [label="is_a"];
+
+    "Материнская плата" -> "BIOS/UEFI" [label="contains"];
+    "BIOS/UEFI" -> "Операционная система" [label="loads"];
+    "Windows 11" -> "Операционная система" [label="instance_of"];
+    "Ubuntu Linux" -> "Операционная система" [label="instance_of"];
+
+    "Intel Core i5" -> "Процессор" [label="instance_of"];
+    "AMD Ryzen 5" -> "Процессор" [label="instance_of"];
+    "Kingston Fury 16 GB" -> "Оперативная память" [label="instance_of"];
+    "Samsung 970 EVO" -> "SSD" [label="instance_of"];
+    "NVIDIA GeForce RTX 3060" -> "Видеокарта" [label="instance_of"];
+    "Chieftec 650W" -> "Блок питания" [label="instance_of"];
+
+    "Процессор" -> "Материнская плата" [label="connects_to"];
+    "Оперативная память" -> "Материнская плата" [label="connects_to"];
+    "Видеокарта" -> "Материнская плата" [label="connects_to"];
+    "SSD" -> "Материнская плата" [label="connects_to"];
+
+    "Блок питания" -> "Материнская плата" [label="powers"];
+    "Блок питания" -> "Видеокарта" [label="powers"];
+    "Система охлаждения" -> "Процессор" [label="cools"];
+}
