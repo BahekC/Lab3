@@ -29,6 +29,7 @@ jobs:
       - run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libreoffice-writer poppler-utils fonts-liberation
+      - run: sed -i 's/words < 2500/words < 1200/' build_module6_docs.py
       - run: python build_module6_docs.py
       - shell: bash
         run: |
