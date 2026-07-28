@@ -1,0 +1,66 @@
+name: Build Module 6 DOCX
+
+on:
+  push:
+    branches:
+      - chatgpt-docx-module6-20260729
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: python -m pip install --upgrade pip python-docx Pillow
+
+      - name: Install rendering tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libreoffice-writer poppler-utils fonts-liberation
+
+      - name: Build DOCX files
+        run: python build_module6_docs.py
+
+      - name: Render and validate every document
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p rendered/pdf rendered/png
+          export HOME="$RUNNER_TEMP/lo-home"
+          mkdir -p "$HOME"
+          : > render_report.txt
+          for doc in output/*.docx; do
+            base="$(basename "$doc" .docx)"
+            profile="file://$RUNNER_TEMP/lo-profile-${RANDOM}-${RANDOM}"
+            soffice -env:UserInstallation="$profile" --headless --convert-to pdf --outdir rendered/pdf "$doc"
+            pdf="rendered/pdf/${base}.pdf"
+            test -s "$pdf"
+            mkdir -p "rendered/png/${base}"
+            pdftoppm -png -r 110 "$pdf" "rendered/png/${base}/page"
+            pages=$(find "rendered/png/${base}" -name 'page-*.png' | wc -l)
+            test "$pages" -gt 0
+            echo -e "${base}\tpages=${pages}\tdocx_bytes=$(stat -c%s "$doc")\tpdf_bytes=$(stat -c%s "$pdf")" >> render_report.txt
+          done
+          cat qa_report.txt
+          cat render_report.txt
+
+      - name: Commit generated artifacts for retrieval
+        shell: bash
+        run: |
+          git config user.name "chatgpt-docx-builder"
+          git config user.email "actions@users.noreply.github.com"
+          git add output rendered qa_report.txt render_report.txt
+          git commit -m "Build Module 6 DOCX artifacts [skip ci]"
+          git push origin HEAD:chatgpt-docx-module6-20260729
