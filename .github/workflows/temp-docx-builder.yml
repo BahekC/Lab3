@@ -5,22 +5,60 @@ on:
     branches:
       - main
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      TARGET_BRANCH: ${{ github.event.pull_request.head.ref }}
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Expand DOCX packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p package/{01,02,03,04,05,06}
+          unzip -q 'output/Практическая_работа_Модуль_06_Работа_01_Проектирование_структуры_электронного_курса.docx' -d package/01
+          unzip -q 'output/Практическая_работа_Модуль_06_Работа_02_Создание_страницы_занятия_в_LMS_или_учебной_платформе.docx' -d package/02
+          unzip -q 'output/Практическая_работа_Модуль_06_Работа_03_Разработка_онлайн-теста_и_задания_с_автоматической_проверкой.docx' -d package/03
+          unzip -q 'output/Практическая_работа_Модуль_06_Работа_04_Подготовка_сценария_вебинара_с_интерактивными_элементами.docx' -d package/04
+          unzip -q 'output/Практическая_работа_Модуль_06_Работа_05_Настройка_коммуникации_и_обратной_связи_в_дистанционной_группе.docx' -d package/05
+          unzip -q 'output/Практическая_работа_Модуль_06_Работа_06_Анализ_рисков_дистанционного_обучения_и_мер_профилактики.docx' -d package/06
+
       - uses: actions/upload-artifact@v4
         with:
-          name: module6-docx
-          path: output/*.docx
-          compression-level: 0
+          name: docx-01
+          path: package/01/*
+          compression-level: 6
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docx-02
+          path: package/02/*
+          compression-level: 6
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docx-03
+          path: package/03/*
+          compression-level: 6
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docx-04
+          path: package/04/*
+          compression-level: 6
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docx-05
+          path: package/05/*
+          compression-level: 6
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docx-06
+          path: package/06/*
+          compression-level: 6
           if-no-files-found: error
