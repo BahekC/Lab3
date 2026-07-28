@@ -1,1 +1,1 @@
-Build requested 2026-07-29, artifact export enabled.
+Build requested 2026-07-29, individual DOCX package export enabled.
