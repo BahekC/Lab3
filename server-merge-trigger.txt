@@ -1,0 +1,1 @@
+Trigger the isolated DOCX workflow through a GitHub merge event.
