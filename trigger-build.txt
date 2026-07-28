@@ -1,1 +1,1 @@
-Build requested 2026-07-29, validation threshold adjusted.
+Build requested 2026-07-29, artifact export enabled.
