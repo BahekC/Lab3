@@ -1,9 +1,6 @@
 name: Temporary document builder
 
 on:
-  push:
-    branches:
-      - chatgpt-docx-module6-20260729
   pull_request:
     branches:
       - main
@@ -13,47 +10,17 @@ permissions:
 
 jobs:
   build:
-    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      TARGET_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      TARGET_BRANCH: ${{ github.event.pull_request.head.ref }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
-      - uses: actions/setup-python@v5
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/upload-artifact@v4
         with:
-          python-version: '3.12'
-      - run: python -m pip install --upgrade pip python-docx Pillow
-      - run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libreoffice-writer poppler-utils fonts-liberation
-      - run: sed -i 's/words < 2500/words < 1200/' build_module6_docs.py
-      - run: python build_module6_docs.py
-      - shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p rendered/pdf rendered/png
-          export HOME="$RUNNER_TEMP/lo-home"
-          mkdir -p "$HOME"
-          : > render_report.txt
-          for doc in output/*.docx; do
-            base="$(basename "$doc" .docx)"
-            profile="file://$RUNNER_TEMP/lo-profile-${RANDOM}-${RANDOM}"
-            soffice -env:UserInstallation="$profile" --headless --convert-to pdf --outdir rendered/pdf "$doc"
-            pdf="rendered/pdf/${base}.pdf"
-            test -s "$pdf"
-            mkdir -p "rendered/png/${base}"
-            pdftoppm -png -r 110 "$pdf" "rendered/png/${base}/page"
-            pages=$(find "rendered/png/${base}" -name 'page-*.png' | wc -l)
-            test "$pages" -gt 0
-            echo -e "${base}\tpages=${pages}\tdocx_bytes=$(stat -c%s "$doc")\tpdf_bytes=$(stat -c%s "$pdf")" >> render_report.txt
-          done
-      - shell: bash
-        run: |
-          git config user.name "chatgpt-docx-builder"
-          git config user.email "actions@users.noreply.github.com"
-          git add output rendered qa_report.txt render_report.txt
-          git commit -m "Build Module 6 DOCX artifacts [skip ci]"
-          git push origin HEAD:"$TARGET_BRANCH"
+          name: module6-docx
+          path: output/*.docx
+          compression-level: 0
+          if-no-files-found: error
